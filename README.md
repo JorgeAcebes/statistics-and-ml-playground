@@ -14,7 +14,7 @@ This repository serves as a practical testing environment for note-taking and co
 
 ---
 
-## Directory Structure
+## Directory Structure (Work In Progress)
 
 ```text
 ├── 1_practical_statistics/    # Statistical foundations (Franco di Leo)
