@@ -126,4 +126,4 @@ $$
 
 ---
 
-[![Basic Statistics PDF](./docs/basic_statistics.pdf)](./docs/basic_statistics.pdf)
+[![Basic Statistics PDF](./docs/basic_statistics.jpg)](./docs/basic_statistics.pdf)
