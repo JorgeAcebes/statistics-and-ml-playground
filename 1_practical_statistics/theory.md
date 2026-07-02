@@ -1,63 +1,129 @@
 # Introduction to Statistics
 
+## Index
+- [Introduction to Statistics](#introduction-to-statistics)
+  - [Index](#index)
+  - [1. Data Types and Variables](#1-data-types-and-variables)
+    - [Data Classification](#data-classification)
+    - [Variable Categories](#variable-categories)
+  - [2. Descriptive Statistics](#2-descriptive-statistics)
+    - [Measures of Dispersion](#measures-of-dispersion)
+      - [Variance](#variance)
+      - [Standard Deviation](#standard-deviation)
+    - [Measures of Position (Quantiles)](#measures-of-position-quantiles)
+      - [Quartiles](#quartiles)
+  - [3. Probability Functions](#3-probability-functions)
+    - [Probability Mass Functions (PMFs)](#probability-mass-functions-pmfs)
+      - [Bernoulli distribution](#bernoulli-distribution)
+      - [Binomial distribution](#binomial-distribution)
+      - [Poisson distribution](#poisson-distribution)
+      - [Geometric distribution](#geometric-distribution)
+      - [Hypergeometric distribution](#hypergeometric-distribution)
+      - [Negative Binomial distribution *(optional)*](#negative-binomial-distribution-optional)
+
 ---
-> # Class 1
 
-## Data Types
+## 1. Data Types and Variables
 
-* Qualitative: categorical properties (e.g. person's eye color, type of fruit, ...)
-* Quantitative: properties that can be counted or measured (e.g. age, blood pressure, ...)
+### Data Classification
+* **Qualitative:** Categorical properties (e.g., eye color, fruit type).
+* **Quantitative:** Properties that can be counted or measured (e.g., age, blood pressure).
 
-## Variable Types
-
-* Nominal Qualitative: the values taken by the variable allow to segregate the population into mutually exclusive categories (e.g. marital status)
-* Ordinal Qualitative: the values taken by the variable can be ordered (e.g. the condition of a patient in a hospital: good, mild, severe)
-* Discrete Quantitative: the values taken by the variable can only take certain values within (an interval in) the real numbers (e.g. number of cars someone owns)
-* Continuous Quantitative: the values taken by the variable can take all possible values within (an interval in) the real numbers (e.g. weight, height)
-
-## Areas of Statistics
-* Descriptive: It is dedicated to the description, visualization, and summarization of data originating from the phenomena under study. Its objective is to organize and describe the characteristics of a data set in order to facilitate interpretation.
-
-* Inferential: It is dedicated to the generation of models and predictions associated with the phenomena in question, taking into account the randomness of the observations.
+### Variable Categories
+* **Nominal Qualitative:** Values segregate the population into mutually exclusive, unordered categories (e.g., marital status).
+* **Ordinal Qualitative:** Values possess a natural, meaningful ordering (e.g., patient condition: good, mild, severe).
+* **Discrete Quantitative:** Variables that take distinct, countable values within a real interval (e.g., number of cars owned).
+* **Continuous Quantitative:** Variables that can take any real value within an interval (e.g., weight, height).
 
 ---
 
-> # Class 2
+## 2. Descriptive Statistics
 
-## Variance and Standard Deviation
+### Measures of Dispersion
 
-### Variance 
+#### Variance
 
-- If using the total population:
+* **Population Variance:** Used when analyzing the complete population ($N$).
+$$\text{var}(x) = \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2$$
+where $\mu$ is the population mean.
 
-$$\text{var}(x) = \sigma^2 = \frac{1}{N} \; \displaystyle{\sum_{i=1}}(x_i - \mu) $$
+* **Sample Variance:** Uses Bessel's correction ($N-1$) to provide an unbiased estimator from a sample.
+$$\text{var}(x) = s^2 = \frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2$$
+where $\bar{x}$ is the sample mean.
 
-where $\mu$ is the mean of the total population.
+#### Standard Deviation
+$$\sigma = \sqrt{\text{var}(x)}$$
 
-- If using a sample of the population  (Bessel's correction): 
-  
-$$\text{var}(x) = s^2 = \frac{1}{N-1} \; \displaystyle{\sum_{i=1}}(x_i - \bar{x}) $$
+### Measures of Position (Quantiles)
+A **percentile** is the value below which a given percentage of observations falls (e.g., the 80th percentile is the threshold holding 80% of the data below it).
 
-where $\bar{x}$ is the mean of the sample.
+#### Quartiles
+Specific percentiles dividing the dataset into four equal parts:
+* **$Q_1$ (First quartile):** 25th percentile.
+* **$Q_2$ (Second quartile):** 50th percentile, identical to the **median**.
+* **$Q_3$ (Third quartile):** 75th percentile.
+
+---
+## 3. Probability Functions
 
 
-### Standard Deviation
+### Probability Mass Functions (PMFs) 
 
-$$\sigma = \sqrt{\rm var}$$
+Functions that give the probability $P$ that a descrete random variable $X$ is exactly equal to some value (generally $x$ or $k$).
+
+#### Bernoulli distribution
+
+Models a single trial with binary outcomes: success ($x=1$) with probability $p$, or failure ($x=0$) with probability $1-p$.
+
+$$
+P(X=x)=p^x(1-p)^{1-x}, \qquad x\in\{0,1\} \equiv \{\rm failure, success\}
+$$
 
 
-## Percentiles
+#### Binomial distribution
 
-A percentile is a value below which a given percentage of the observations in a dataset falls.
+Models the total number of successes $k$ in $n$ independent Bernoulli trials with a constant success probability $p$.
 
-**Example:**
+$$P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}, \qquad k \in \{0, 1, \dots, n\}$$
 
-- 80th percentile: the value below which 80% of the data lie.
 
-### Quartiles
+#### Poisson distribution
 
-Quartiles are specific percentiles that divide the data into four equal parts:
 
-- **Q1 (First quartile):** 25th percentile (25% of the data lie below it).
-- **Q2 (Second quartile):** 50th percentile, also known as the **median**.
-- **Q3 (Third quartile):** 75th percentile (75% of the data lie below it).
+Models the probability of $k$ events ocurring in a fixed interval when:
+- events occur **independently**,
+- events occur at a **constant average rate** $\lambda$,
+- and the probability of **two or more events occurring simultaneously is negligible**.
+
+$$P(X=k) = \frac{\lambda^k e^{-\lambda}}{k!}, \qquad k \in \{0, 1, 2, \dots\}$$
+
+
+#### Geometric distribution
+
+Models the number of trials $k$ required to achieve the first success in a sequence of independent Bernoulli trials.
+
+$$P(X=k) = (1-p)^{k-1}p, \qquad k \in \{1, 2, \dots\}$$
+
+#### Hypergeometric distribution 
+
+Models the number of successes $k$ in a sample size $n$ drawn **without replacement** from a finite population $N$ containing $K$ total successes.
+$$P(X=k) = \frac{\binom{K}{k}\binom{N-K}{n-k}}{\binom{N}{n}}$$
+
+---
+
+#### Negative Binomial distribution *(optional)*
+
+Models the probability that the \(r\)-th success occurs on the \(k\)-th trial:
+
+$$
+P(X=k)=\binom{k-1}{r-1}p^r(1-p)^{k-r}, \qquad k=r,r+1,\ldots
+$$
+
+
+
+
+
+
+---
+
+[![Basic Statistics PDF](./docs/basic_statistics.pdf)](./docs/basic_statistics.pdf)
