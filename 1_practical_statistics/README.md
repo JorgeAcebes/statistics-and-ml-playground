@@ -56,15 +56,11 @@
 #### Variance
 
 * **Population Variance:** Used when analyzing the complete population ($N$).
-  
 $$\text{var}(x) = \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2$$
-
 where $\mu$ is the population mean.
 
 * **Sample Variance:** Uses Bessel's correction ($N-1$) to provide an unbiased estimator from a sample.
-  
 $$\text{var}(x) = s^2 = \frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2$$
-
 where $\bar{x}$ is the sample mean.
 
 #### Standard Deviation
@@ -123,7 +119,6 @@ $$P(X=k) = (1-p)^{k-1}p, \qquad k \in \{1, 2, \dots\}$$
 #### Hypergeometric distribution 
 
 Models the number of successes $k$ in a sample size $n$ drawn **without replacement** from a finite population $N$ containing $K$ total successes.
-
 $$P(X=k) = \frac{\binom{K}{k}\binom{N-K}{n-k}}{\binom{N}{n}}$$
 
 #### Negative Binomial distribution
