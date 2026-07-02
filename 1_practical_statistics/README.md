@@ -22,6 +22,7 @@
     - [Probability Density Functions (PDFs)](#probability-density-functions-pdfs)
       - [Uniform distribution](#uniform-distribution)
       - [Normal (Gaussian) distribution](#normal-gaussian-distribution)
+        - [Standard Normal distribution](#standard-normal-distribution)
       - [Exponential distribution](#exponential-distribution)
       - [Gamma distribution](#gamma-distribution)
       - [Beta distribution](#beta-distribution)
@@ -181,6 +182,13 @@ e^{-\frac{(x-\mu)^2}{2\sigma^2}},
 \qquad x\in\mathbb{R}
 $$
 
+##### Standard Normal distribution
+
+Special case of the normal distribution where $\mu = 0$ and $\sigma=1$. 
+
+If the variable $x$ does not have a mean 0 and standard deviation of 1, it should be *standardized* in order to obtain a **standard normal distribution**:
+
+$$z = \frac{x-\mu}{\sigma}$$
 
 #### Exponential distribution
 
