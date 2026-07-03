@@ -23,6 +23,7 @@
       - [Uniform distribution](#uniform-distribution)
       - [Normal (Gaussian) distribution](#normal-gaussian-distribution)
         - [Standard Normal distribution](#standard-normal-distribution)
+          - [Sampling and Confidence Intervals](#sampling-and-confidence-intervals)
       - [Exponential distribution](#exponential-distribution)
       - [Gamma distribution](#gamma-distribution)
       - [Beta distribution](#beta-distribution)
@@ -189,6 +190,31 @@ Special case of the normal distribution where $\mu = 0$ and $\sigma=1$.
 If the variable $x$ does not have a mean 0 and standard deviation of 1, it should be *standardized* in order to obtain a **standard normal distribution**:
 
 $$z = \frac{x-\mu}{\sigma}$$
+
+
+###### Sampling and Confidence Intervals
+
+Let a population variable be distributed as $X \sim N(\mu, \sigma^2)$. For a sample of size $n$, the sample mean $\bar{X}$ is also normally distributed:
+
+$$\bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)$$
+
+
+To compute probabilities, it must be standardized using the standard error $\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}$:
+
+$$Z = \frac{\bar{X} - \mu}{\sigma / \sqrt{n}} \sim N(0, 1)$$
+
+
+The confidence interval is an estimator used to bound a population parameter with a specific confidence level $1 - \alpha$.
+
+
+**Confidence interval for the Mean ($\sigma$ known)**: Constructed by finding a critical value $z_{\alpha/2}$ from the Standard Normal distribution such that $P\left(-z_{\alpha/2} \le Z \le z_{\alpha/2}\right) = 1 - \alpha$.
+
+$$I_C = \left[ \bar{X} - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}, \,\, \bar{X} + z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \right]$$
+
+**Margin of Error ($E$)**: The maximum expected distance between the sample statistic and the true population parameter:
+
+$$E = z_{\alpha/2} \frac{\sigma}{\sqrt{n}}$$
+
 
 #### Exponential distribution
 
