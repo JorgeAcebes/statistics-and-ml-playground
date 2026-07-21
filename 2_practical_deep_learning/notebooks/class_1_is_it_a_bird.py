@@ -6,35 +6,40 @@
 
 # %%
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd 
-import seaborn as sns
-import time, json
 import sys
-
-
-from numpy import random
-from scipy.stats import norm
-from fastcore.all import *
+import time
+import ssl
+import torch
 from pathlib import Path
 
 
-from ddgs import DDGS #DuckDuckGo has changed the api so we need to update 
+# Fastcore patch must be applied before importing fastai to guarantee inheritance
+import fastcore.foundation
+def _starmap(self, f, *args, **kwargs):
+    return self.map(lambda o: f(*o, *args, **kwargs))
+fastcore.foundation.L.starmap = _starmap
+
 from fastcore.all import *
+from fastai.vision.all import *
+from fastdownload import download_url
+from ddgs import DDGS 
 
 print('Imported libraries')
 
 # %%
 
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 PRACTICAL_DL_DIR = SCRIPT_DIR.parent
 DATA_DIR = PRACTICAL_DL_DIR / 'data'
+DATA_DIR.mkdir(exist_ok=True, parents=True)
+
+
 
 # %% [markdown]
 # ## Step 1: Download images of birds and non-birds
 
-#%%
+# %%
 def search_images(keywords, max_images=200): 
     time.sleep(2)
     return L(DDGS().images(keywords, max_results=max_images)).itemgot('image')
@@ -43,8 +48,6 @@ def search_images(keywords, max_images=200):
 # Let's start by searching for a bird photo and seeing what kind of result we get. We'll start by getting URLs from a search:
 
 # %%
-#NB: `search_images` depends on duckduckgo.com, which doesn't always return correct responses.
-#    If you get a JSON error, just try running it again (it may take a couple of tries).
 urls = search_images('bird photos', max_images=1)
 urls[0]
 
@@ -52,93 +55,87 @@ urls[0]
 # ...and then download a URL and take a look at it:
 
 # %%
-from fastdownload import download_url
-import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
-dest = DATA_DIR/'bird.jpg'
-download_url(urls[0], dest, show_progress=False)
+dest_bird = DATA_DIR / 'bird.jpg'
+download_url(urls[0], dest_bird, show_progress=False)
 
-from fastai.vision.all import *
-im = Image.open(dest)
+im = Image.open(dest_bird)
 im.to_thumb(256,256)
 
 # %% [markdown]
 # Now let's do the same with "forest photos":
 
 # %%
-download_url(search_images('forest photos', max_images=1)[0], 'forest.jpg', show_progress=False)
-Image.open(DATA_DIR/'forest.jpg').to_thumb(256,256)
+dest_forest = DATA_DIR / 'forest.jpg'
+download_url(search_images('forest photos', max_images=1)[0], dest_forest, show_progress=False)
+Image.open(dest_forest).to_thumb(256,256)
 
 # %% [markdown]
 # Our searches seem to be giving reasonable results, so let's grab a few examples of each of "bird" and "forest" photos, and save each group of photos to a different folder:
 
 # %%
-searches = 'forest','bird'
-path = Path(DATA_DIR/'bird_or_not')
+searches = 'forest', 'bird'
+path = Path(DATA_DIR / 'bird_or_not')
 
 for o in searches:
     dest = (path/o)
     dest.mkdir(exist_ok=True, parents=True)
     download_images(dest, urls=search_images(f'{o} photo'))
-    time.sleep(5)
-    resize_images(path/o, max_size=500, dest=path/o)
-
-# %%
-# Checking if there are the same number of data of each type
-
-bird = Path(DATA_DIR/'bird_or_not'/'bird')
-fore = Path(DATA_DIR/'bird_or_not'/'forest')
-
-tot_bird = len(list(bird.iterdir()))
-tot_fore = len(list(fore.iterdir()))
-
-
-print(f'Birds:  {tot_bird}\nForest: {tot_fore}')
-
-# %%
-
-# Fixing number mismatch
-
-valid_exts = ('.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff')
-files_bird = [f for f in os.listdir(bird) if f.lower().endswith(valid_exts)]
-files_fore = [f for f in os.listdir(fore) if f.lower().endswith(valid_exts)]
-
-
-if tot_fore > tot_bird:
-    files_fore.sort()
-    to_remove = files_fore[tot_bird:]
-
-    for file_name in to_remove:
-        file_path = os.path.join(fore, file_name)
-        os.remove(file_path)
-    
-elif tot_fore < tot_bird:
-    files_bird.sort()
-    to_remove = files_bird[tot_fore:]
-    
-    for file_name in to_remove:
-        file_path = os.path.join(bird, file_name)
-        os.remove(file_path)
-        print(f"Eliminado: {file_name}")
-
-else:
-    print("They already have the same number of images")
-
+    time.sleep(10)
+    resize_images(path/o, max_workers=1, max_size=300, dest=path/o)
 
 # %% [markdown]
-# ## Step 2: Train our model
-
-# %% [markdown]
-# Some photos might not download correctly which could cause our model training to fail, so we'll remove them:
+# ## Step 2: Clean and Balance Data
 
 # %%
-failed = verify_images(get_image_files(path))
+from PIL import Image
+import warnings
+
+# 1. Verify and remove corrupted images sequentially to avoid BrokenProcessPool on Windows
+# We ignore harmless ICC profile warnings from PIL
+warnings.filterwarnings("ignore", category=UserWarning)
+
+files = get_image_files(path)
+failed = []
+
+# Iterate through each file and force a full memory load to catch C-level segfaults
+for fn in files:
+    try:
+        with Image.open(fn) as img:
+            img.load() 
+    except Exception:
+        # If the image is truncated or completely corrupted, append it to the fail list
+        failed.append(fn)
+
+failed = L(failed)
 failed.map(Path.unlink)
-len(failed)
+print(f'Corrupted images removed: {len(failed)}')
+
+# 2. Balance the dataset sizes SECOND (only after removing corrupted ones)
+bird = path / 'bird'
+fore = path / 'forest'
+
+files_bird = get_image_files(bird).sorted()
+files_fore = get_image_files(fore).sorted()
+
+tot_bird = len(files_bird)
+tot_fore = len(files_fore)
+
+print(f'Initial count -> Birds: {tot_bird} | Forest: {tot_fore}')
+
+# Truncate the larger class to match the size of the smaller class
+if tot_fore > tot_bird:
+    to_remove = files_fore[tot_bird:]
+    for f in to_remove: f.unlink()
+elif tot_fore < tot_bird:
+    to_remove = files_bird[tot_fore:]
+    for f in to_remove: f.unlink()
+
+print(f'Final count -> Birds: {len(get_image_files(bird))} | Forest: {len(get_image_files(fore))}')
 
 # %% [markdown]
-# To train a model, we'll need `DataLoaders`, which is an object that contains a *training set* (the images used to create a model) and a *validation set* (the images used to check the accuracy of a model -- not used during training). In `fastai` we can create that easily using a `DataBlock`, and view sample images from it:
+# ## Step 3: Train our model
 
 # %%
 dls = DataBlock(
@@ -147,11 +144,12 @@ dls = DataBlock(
     splitter=RandomSplitter(valid_pct=0.2, seed=42),
     get_y=parent_label,
     item_tfms=[Resize(192, method='squish')]
-).dataloaders(path, bs=32)
+).dataloaders(path, bs=8)
 
 dls.show_batch(max_n=6)
 
-# Some 
+
+# Some bird photos are AI slop :(
 
 # %% [markdown]
 # Here what each of the `DataBlock` parameters means:
@@ -177,45 +175,37 @@ dls.show_batch(max_n=6)
 # Before training, resize each image to 192x192 pixels by "squishing" it (as opposed to cropping it).
 
 # %% [markdown]
-# Now we're ready to train our model. The fastest widely used computer vision model is `resnet18`. You can train this in a few minutes, even on a CPU! (On a GPU, it generally takes under 10 seconds...)
-# 
-# `fastai` comes with a helpful `fine_tune()` method which automatically uses best practices for fine tuning a pre-trained model, so we'll use that.
+# Now we're ready to train our model. The fastest widely used computer vision model is `resnet18`.
 
 # %%
 learn = vision_learner(dls, resnet18, metrics=error_rate)
 learn.fine_tune(3)
 
 # %% [markdown]
-# Generally when I run this I see 100% accuracy on the validation set (although it might vary a bit from run to run).
-# 
-# "Fine-tuning" a model means that we're starting with a model someone else has trained using some other dataset (called the *pretrained model*), and adjusting the weights a little bit so that the model learns to recognise your particular dataset. In this case, the pretrained model was trained to recognise photos in *imagenet*, and widely-used computer vision dataset with images covering 1000 categories) For details on fine-tuning and why it's important, check out the [free fast.ai course](https://course.fast.ai/).
-
-# %% [markdown]
-# ## Step 3: Use our model (and build your own!)
-
-# %% [markdown]
-# Let's see what our model thinks about that bird we downloaded at the start:
+# ## Step 4: Use our model
 
 # %%
-is_bird,_,probs = learn.predict(PILImage.create('bird.jpg'))
+# Using the correctly scoped variable from earlier
+is_bird, _, probs = learn.predict(PILImage.create(dest_bird))
 print(f"This is a: {is_bird}.")
 print(f"Probability it's a bird: {probs[0]:.4f}")
-
-# %% [markdown]
-# Good job, resnet18. :)
-# 
-# So, as you see, in the space of a few years, creating computer vision classification models has gone from "so hard it's a joke" to "trivially easy and free"!
-# 
-# It's not just in computer vision. Thanks to deep learning, computers can now do many things which seemed impossible just a few years ago, including [creating amazing artworks](https://openai.com/dall-e-2/), and [explaining jokes](https://www.datanami.com/2022/04/22/googles-massive-new-language-model-can-explain-jokes/). It's moving so fast that even experts in the field have trouble predicting how it's going to impact society in the coming years.
-# 
-# One thing is clear -- it's important that we all do our best to understand this technology, because otherwise we'll get left behind!
-
-# %% [markdown]
-# Now it's your turn. Click "Copy & Edit" and try creating your own image classifier using your own image searches!
-# 
-# If you enjoyed this, please consider clicking the "upvote" button in the top-right -- it's very encouraging to us notebook authors to know when people appreciate our work.
-
 # %%
 
+# I will also try with some photos I took in my trip to Costa Rica
+
+bird_CR = DATA_DIR/'colibri.jpg'
+forest_CR = DATA_DIR /'forest_CR.jpg'
+guacamayo_CR = DATA_DIR/'guacamayo.jpg'
+butterfly_CR = DATA_DIR/'butterfly.jpg'
+
+to_check = [bird_CR, forest_CR, guacamayo_CR, butterfly_CR]
 
 
+def bird_checker(path: Path):
+    is_bird, _, probs = learn.predict(PILImage.create(path))
+    print(f"AI says this is a: {is_bird}. Original name: {path.stem}")
+    print(f"Probability it's a bird: {probs[0]:.4f}")
+
+
+for check in to_check:
+    bird_checker(check)
