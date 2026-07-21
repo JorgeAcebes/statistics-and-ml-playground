@@ -18,9 +18,9 @@ This repository serves as a practical testing environment for note-taking and co
 
 ```text
 ├── 1_practical_statistics/    # Statistical foundations (Franco di Leo)
-│   ├── exploratory_data/      # Central tendency, variability, and data distributions
-│   ├── probability/           # Random variables, Bayes' theorem, and sampling
-│   └── hypothesis_testing/    # A/B testing, p-values, and statistical significance
+│   ├── data/                  # .csv files used in notebooks
+│   ├── docs/                  # Statistic Cheatsheet 
+│   ├── notebooks/             # Dataframes, Graphs (matplotlib and seaborn) and Distributions
 ├── 2_practical_deep_learning/ # High-level Deep Learning implementations (Fast.ai)
 │   ├── notebooks/             # Top-down applications (Computer Vision models)
 │   └── answers/               # Text-based questionnaire solutions
