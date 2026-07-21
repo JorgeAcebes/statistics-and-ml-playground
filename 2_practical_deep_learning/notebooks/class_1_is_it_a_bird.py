@@ -151,6 +151,8 @@ dls = DataBlock(
 
 dls.show_batch(max_n=6)
 
+# Some 
+
 # %% [markdown]
 # Here what each of the `DataBlock` parameters means:
 # 
