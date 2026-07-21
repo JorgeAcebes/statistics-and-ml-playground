@@ -82,10 +82,9 @@ for o in searches:
     dest.mkdir(exist_ok=True, parents=True)
     download_images(dest, urls=search_images(f'{o} photo'))
     time.sleep(5)
-    resize_images(path/o, max_size=400, max_workers=0, dest=path/o)
+    resize_images(path/o, max_size=500, dest=path/o)
 
-# %% 
-
+# %%
 # Checking if there are the same number of data of each type
 
 bird = Path(DATA_DIR/'bird_or_not'/'bird')
@@ -96,6 +95,37 @@ tot_fore = len(list(fore.iterdir()))
 
 
 print(f'Birds:  {tot_bird}\nForest: {tot_fore}')
+
+# %%
+
+# Fixing number mismatch
+
+valid_exts = ('.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff')
+files_bird = [f for f in os.listdir(bird) if f.lower().endswith(valid_exts)]
+files_fore = [f for f in os.listdir(fore) if f.lower().endswith(valid_exts)]
+
+
+if tot_fore > tot_bird:
+    files_fore.sort()
+    to_remove = files_fore[tot_bird:]
+
+    for file_name in to_remove:
+        file_path = os.path.join(fore, file_name)
+        os.remove(file_path)
+    
+elif tot_fore < tot_bird:
+    files_bird.sort()
+    to_remove = files_bird[tot_fore:]
+    
+    for file_name in to_remove:
+        file_path = os.path.join(bird, file_name)
+        os.remove(file_path)
+        print(f"Eliminado: {file_name}")
+
+else:
+    print("They already have the same number of images")
+
+
 # %% [markdown]
 # ## Step 2: Train our model
 
