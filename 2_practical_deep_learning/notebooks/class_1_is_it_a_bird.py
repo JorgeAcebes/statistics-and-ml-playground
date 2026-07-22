@@ -4,6 +4,8 @@
 
 # Original code [here](https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data).
 
+# I recommend working with the other script (class_1_is_it_a_bird_with_kaggle.py)
+
 # %%
 import os
 import sys
