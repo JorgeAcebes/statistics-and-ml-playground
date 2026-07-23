@@ -20,10 +20,11 @@ This repository serves as a practical testing environment for note-taking and co
 ├── 1_practical_statistics/    # Statistical foundations (Franco di Leo)
 │   ├── data/                  # .csv files used in notebooks
 │   ├── docs/                  # Statistic Cheatsheet 
-│   ├── notebooks/             # Dataframes, Graphs (matplotlib and seaborn) and Distributions
+│   └── notebooks/             # Dataframes, Graphs (matplotlib and seaborn) and Distributions
 ├── 2_practical_deep_learning/ # High-level Deep Learning implementations (Fast.ai)
-│   ├── notebooks/             # Top-down applications (Computer Vision models)
-│   └── answers/               # Text-based questionnaire solutions
+│   ├── data/                  # .csv files used in notebooks
+│   ├── docs/                  # notebooks' results
+│   └──notebooks/              # Top-down applications (Computer Vision models)
 └── 3_pytorch_for_ml_and_dl/   # Low-level PyTorch mechanics (freeCodeCamp)
     ├── 00_fundamentals/       # Tensor manipulation, reproducibility, and CUDA device management
     ├── 01_workflow/           # Training loops: Forward pass, loss calculation, backward pass
