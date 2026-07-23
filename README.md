@@ -24,7 +24,7 @@ This repository serves as a practical testing environment for note-taking and co
 ├── 2_practical_deep_learning/ # High-level Deep Learning implementations (Fast.ai)
 │   ├── data/                  # .csv files used in notebooks
 │   ├── docs/                  # notebooks' results
-│   └──notebooks/              # Top-down applications (Computer Vision models)
+│   └── notebooks/             # Computer Vision models (mainly)
 └── 3_pytorch_for_ml_and_dl/   # Low-level PyTorch mechanics (freeCodeCamp)
     ├── 00_fundamentals/       # Tensor manipulation, reproducibility, and CUDA device management
     ├── 01_workflow/           # Training loops: Forward pass, loss calculation, backward pass
