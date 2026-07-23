@@ -9,8 +9,10 @@ import torch
 import random
 import kagglehub
 import warnings
+import matplotlib.pyplot as plt
 from pathlib import Path
 from PIL import Image
+
 
 # Fastcore patch must be applied before importing fastai to guarantee inheritance
 import fastcore.foundation
@@ -28,6 +30,8 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 PRACTICAL_DL_DIR = SCRIPT_DIR.parent
 DATA_DIR = PRACTICAL_DL_DIR / 'data'
 DATA_DIR.mkdir(exist_ok=True, parents=True)
+DOCS_DIR = PRACTICAL_DL_DIR / 'docs'
+DOCS_DIR.mkdir(exist_ok=True, parents=True)
 path = DATA_DIR / 'bird_or_not'
 
 # %% [markdown]
@@ -164,13 +168,51 @@ giant_wasp_CR = DATA_DIR/'giant_wasp.jpg'
 
 to_check = [bird_CR, forest_CR, guacamayo_CR, butterfly_CR, sea_bird_CR, giant_wasp_CR]
 
-def bird_checker(file_path: Path):
-    if file_path.exists():
-        is_bird, _, probs = learn.predict(PILImage.create(file_path))
-        print(f"AI says this is a: {is_bird}. Original name: {file_path.stem}")
-        print(f"Probability it's a bird: {probs[0]:.4f}")
-    else:
-        print(f"File not found: {file_path}")
 
-for check in to_check:
-    bird_checker(check)
+
+def photo_predictor_grid(axes, to_check, name='class_1_predictions.pdf'):
+    for ax, file_path in zip(axes, to_check):
+        if file_path.exists():
+            is_bird, _, probs = learn.predict(PILImage.create(file_path))        
+            bird_prob = probs[0] * 100
+            
+            img = Image.open(file_path)
+            ax.imshow(img)
+            
+            color_title = 'green' if str(is_bird).lower() == 'bird' else 'darkred'
+            ax.set_title(
+                f"Name: {file_path.stem}\n"
+                f"Prediction: {is_bird}\n"
+                f"% Bird: {bird_prob:.2f}%",
+                fontsize=10,
+                color=color_title,
+                fontweight='bold'
+            )
+        else:
+            ax.text(0.5, 0.5, f"Not Found:\n{file_path.name}", 
+                    ha='center', va='center', color='gray')
+        
+        ax.axis('off')  # Ocultar ejes para un acabado limpio
+
+    plt.tight_layout()
+    plt.savefig(DOCS_DIR/name)
+    plt.show()
+
+fig, axes = plt.subplots(2, 3, figsize=(12, 8))
+axes = axes.flatten()
+photo_predictor_grid(axes, to_check, name='class_1_prediction_CR.pdf')
+# %%
+
+# Let's try with not too tricky images (using just birds and forest images, not other animals):
+
+AST_FOR = DATA_DIR/'asturias_forest.jpg'
+BOSQUE = DATA_DIR/'bosque.jpg'
+OWL = DATA_DIR/'Owl.jpg'
+RFB = DATA_DIR/'red_face_bird.jpg'
+
+check = [AST_FOR, BOSQUE, OWL, RFB]
+
+fig_2, axes_2 = plt.subplots(2, 2, figsize=(12, 8))
+axes_2 = axes_2.flatten()
+
+photo_predictor_grid(axes_2, check, name='not_tricky_prediction.pdf')
