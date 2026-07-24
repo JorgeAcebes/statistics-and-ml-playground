@@ -1,8 +1,11 @@
 import streamlit as st
 import pathlib
+import platform
 import fastcore.foundation
 
-# 1. Replicar el parche del espacio de nombres ANTES de importar fastai
+if platform.system() == 'Linux':
+    pathlib.WindowsPath = pathlib.PosixPath
+
 def _starmap(self, f, *args, **kwargs):
     return self.map(lambda o: f(*o, *args, **kwargs))
 fastcore.foundation.L.starmap = _starmap
