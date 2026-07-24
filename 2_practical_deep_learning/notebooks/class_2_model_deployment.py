@@ -185,6 +185,11 @@ for p in pred:
     alig_croc_pred_squish(p)
 
 # %% [markdown]
-#  ## Step 5: Export our model
+#  ## Step 5: Export our model for the Streamlit app
 
-learn.export('model.pkl')
+DEPLOYMENT_DIR = PRACTICAL_DL_DIR / 'deployment'
+DEPLOYMENT_DIR.mkdir(exist_ok=True, parents=True)
+MODEL_PATH = DEPLOYMENT_DIR / 'model.pkl'
+
+learn.export(MODEL_PATH)
+print(f'Model exported to: {MODEL_PATH}')
