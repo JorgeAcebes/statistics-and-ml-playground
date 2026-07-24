@@ -23,6 +23,7 @@ This repository serves as a practical testing environment for note-taking and co
 │   └── notebooks/             # Dataframes, Graphs (matplotlib and seaborn) and Distributions
 ├── 2_practical_deep_learning/ # High-level Deep Learning implementations (Fast.ai)
 │   ├── data/                  # .csv files used in notebooks
+│   ├── deployment/            # model.pkl, app.py and other files needed for Streamlit deployment
 │   ├── docs/                  # notebooks' results
 │   └── notebooks/             # Computer Vision models (mainly)
 └── 3_pytorch_for_ml_and_dl/   # Low-level PyTorch mechanics (freeCodeCamp)
