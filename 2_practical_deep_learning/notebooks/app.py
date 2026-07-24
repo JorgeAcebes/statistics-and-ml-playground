@@ -1,16 +1,17 @@
-import streamlit as st
+import sys
 import pathlib
-import platform
 import fastcore.foundation
+import streamlit as st
+from fastai.vision.all import load_learner, PILImage
 
-if platform.system() == 'Linux':
+# Parche de compatibilidad WindowsPath -> PosixPath en Linux
+if sys.platform != "win32":
     pathlib.WindowsPath = pathlib.PosixPath
 
 def _starmap(self, f, *args, **kwargs):
     return self.map(lambda o: f(*o, *args, **kwargs))
-fastcore.foundation.L.starmap = _starmap
 
-from fastai.vision.all import load_learner, PILImage
+fastcore.foundation.L.starmap = _starmap
 
 # Persistencia en memoria para evitar recargas del tensor de pesos
 @st.cache_resource
@@ -24,10 +25,9 @@ st.markdown("<h2 style='text-align: center;'>Alligator vs Crocodile</h2>", unsaf
 
 uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
 
-# 2. Restringir la predicción al bloque de carga exitosa
 if uploaded_file is not None:
     img = PILImage.create(uploaded_file)
-    st.image(img, use_container_width=True)
+    st.image(img, use_column_width=True)
 
     # Forward pass
     pred_class, pred_idx, outputs = learn.predict(img)
