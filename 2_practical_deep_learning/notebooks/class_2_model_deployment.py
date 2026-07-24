@@ -191,5 +191,5 @@ DEPLOYMENT_DIR = PRACTICAL_DL_DIR / 'deployment'
 DEPLOYMENT_DIR.mkdir(exist_ok=True, parents=True)
 MODEL_PATH = DEPLOYMENT_DIR / 'model.pkl'
 
-learn.export(MODEL_PATH)
+learn_squish.export(MODEL_PATH)
 print(f'Model exported to: {MODEL_PATH}')
