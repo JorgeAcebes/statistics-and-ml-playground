@@ -114,19 +114,36 @@ print(f'Corrupted images removed: {len(failed)}')
 # ## Step 3: Train our model
 
 # %%
+
+# Let's see how changing the resize method affects the loss
 dls = DataBlock(
     blocks=(ImageBlock, CategoryBlock), 
     get_items=get_image_files, 
     splitter=RandomSplitter(valid_pct=0.2, seed=42),
     get_y=parent_label,
     item_tfms=[Resize(192, method='crop')]
-).dataloaders(path, bs=32)
+).dataloaders([alig_dest, croc_dest], bs=32)
 
 dls.show_batch(max_n=6)
 
+dls_squish = DataBlock(
+    blocks=(ImageBlock, CategoryBlock), 
+    get_items=get_image_files, 
+    splitter=RandomSplitter(valid_pct=0.2, seed=42),
+    get_y=parent_label,
+    item_tfms=[Resize(192, method='squish')]
+).dataloaders([alig_dest, croc_dest], bs=32)
+
+dls_squish.show_batch(max_n=6)
+
 # %%
+
 learn = vision_learner(dls, resnet18, metrics=error_rate)
 learn.fine_tune(3)
+
+learn_squish = vision_learner(dls_squish, resnet18, metrics=error_rate)
+learn_squish.fine_tune(3)
+
 
 # %% [markdown]
 # ## Step 4: Use our model
@@ -138,22 +155,32 @@ print(f"Probability it's an alligator: {probs[0]:.4f}")
 
 # %%
 
+
+
 def alig_croc_pred(dest):
     is_alig, _, probs = learn.predict(PILImage.create(dest))
-    print(f"AI says this is a: {is_alig}. Image name: {dest.stem}")
+    print('='*50)
+    print(f"Method of resizing: CROP\nAI says this is a: {is_alig}. Image name: {dest.stem}")
     print(f"Probability it's an alligator: {probs[0]:.4f}")
+    print('='*50)
+
+
+def alig_croc_pred_squish(dest):
+    is_alig, _, probs = learn_squish.predict(PILImage.create(dest))
+    print('='*50)
+    print(f"Method of resizing: SQUISH\nAI says this is a: {is_alig}. Image name: {dest.stem}")
+    print(f"Probability it's an alligator: {probs[0]:.4f}")
+    print('='*50)
 
 # %%
 
-alig = path/'alligator.jpg'
-alig_2 = path/'alligator_2.jpg'
-croco = path/'CROCO.jpg'
-dunno = path/'dunno_think_croco.jpeg'
+pred = [p for p in path.iterdir() 
+        if p.is_file() and p.suffix.lower() in {'.jpg', '.jpeg', '.png'}]
 
-pred = [alig, alig_2, croco, dunno]
 
 for p in pred: 
     alig_croc_pred(p)
+    alig_croc_pred_squish(p)
 
 # %% [markdown]
 #  ## Step 5: Export our model
