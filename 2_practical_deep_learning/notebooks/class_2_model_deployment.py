@@ -136,6 +136,25 @@ is_alig, _, probs = learn.predict(PILImage.create(dest_alig))
 print(f"This is a: {is_alig}.")
 print(f"Probability it's an alligator: {probs[0]:.4f}")
 
+# %%
+
+def alig_croc_pred(dest):
+    is_alig, _, probs = learn.predict(PILImage.create(dest))
+    print(f"AI says this is a: {is_alig}. Image name: {dest.stem}")
+    print(f"Probability it's an alligator: {probs[0]:.4f}")
+
+# %%
+
+alig = path/'alligator.jpg'
+alig_2 = path/'alligator_2.jpg'
+croco = path/'CROCO.jpg'
+dunno = path/'dunno_think_croco.jpeg'
+
+pred = [alig, alig_2, croco, dunno]
+
+for p in pred: 
+    alig_croc_pred(p)
+
 # %% [markdown]
 #  ## Step 5: Export our model
 
