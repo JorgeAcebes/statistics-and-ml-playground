@@ -116,23 +116,25 @@ print(f'Corrupted images removed: {len(failed)}')
 # %%
 
 # Let's see how changing the resize method affects the loss
+from functools import partial
+
 dls = DataBlock(
     blocks=(ImageBlock, CategoryBlock), 
-    get_items=get_image_files, 
+    get_items=partial(get_image_files, folders=['alig', 'croc']), 
     splitter=RandomSplitter(valid_pct=0.2, seed=42),
     get_y=parent_label,
     item_tfms=[Resize(192, method='crop')]
-).dataloaders([alig_dest, croc_dest], bs=32)
+).dataloaders(path, bs=32)
 
 dls.show_batch(max_n=6)
 
 dls_squish = DataBlock(
     blocks=(ImageBlock, CategoryBlock), 
-    get_items=get_image_files, 
+    get_items=partial(get_image_files, folders=['alig', 'croc']), 
     splitter=RandomSplitter(valid_pct=0.2, seed=42),
     get_y=parent_label,
     item_tfms=[Resize(192, method='squish')]
-).dataloaders([alig_dest, croc_dest], bs=32)
+).dataloaders(path, bs=32)
 
 dls_squish.show_batch(max_n=6)
 
